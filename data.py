@@ -104,7 +104,7 @@ class OcrData():
             m.close()
         
         if self.verbose:
-            print 'Found {} images.'.format(len(self.images))
+            print('Found {} images.'.format(len(self.images)))
     
         return self.images
     
@@ -151,7 +151,7 @@ class OcrData():
         self.labels = map(lambda x: classes[int(x)], self.labels)
         
         if self.verbose:
-            print 'Found {} labels.'.format(len(self.labels))        
+            print('Found {} labels.'.format(len(self.labels)))
            
         return self.labels 
  
@@ -182,11 +182,11 @@ class OcrData():
                                    'target': self.ocr['target'][:self.limit]
                                    }
                     if self.verbose:
-                        print 'Loaded {} images each {} pixels'.format(self.ocr['images'].shape[0], self.img_size)
+                        print('Loaded {} images each {} pixels'.format(self.ocr['images'].shape[0], self.img_size))
                     return self.ocr
                 
             except IOError:
-                print 'You have not provided a .pickle file to load data from!'
+                print('You have not provided a .pickle file to load data from!')
                 sys.exit(0)
         else:
             image_paths = self.getRelativePath()
@@ -216,7 +216,7 @@ class OcrData():
             labels_shuf = np.array(labels)[k]
                 
             if self.verbose:
-                print 'Loaded {} images each {} pixels'.format(len(labels), self.img_size)
+                print('Loaded {} images each {} pixels'.format(len(labels), self.img_size))
             
             self.ocr = {            
                  'images': im_shuf,
@@ -327,16 +327,16 @@ class OcrData():
         parameters combinations using the specified algorithm
         """
         if not self.automatic_split:
-            print 'Before performing any ML you should split your data!'
-            print 'Change to True the automatic_split in the config file.'
+            print('Before performing any ML you should split your data!')
+            print('Change to True the automatic_split in the config file.')
             sys.exit(0)
             
         model, param_grid = self.cross_val_models[model_name]
         
-        print 'Model: ', model_name
-        print 'Parameters: ', param_grid
-        print 'Train set shape: ', self.data_train.shape
-        print 'Target shape: ', self.labels_train.shape
+        print('Model: ', model_name)
+        print('Parameters: ', param_grid)
+        print('Train set shape: ', self.data_train.shape)
+        print('Target shape: ', self.labels_train.shape)
         
         gs = GridSearchCV(model, param_grid, n_jobs=-1, cv=3, verbose=4)
         gs.fit(self.data_train, self.labels_train)
@@ -350,7 +350,7 @@ class OcrData():
         with open(full_name, 'wb') as fout:
             cPickle.dump(gs, fout, -1)
      
-        print "Saved model to {}".format(full_name)
+        print("Saved model to {}".format(full_name))
 
 ###############################################################################################################################
 
@@ -359,14 +359,14 @@ class OcrData():
         trains a model on data using pre-trained NN to extract features and then using SVM with linear kernel.
         """
         n_images = self.images_train.shape[0]
-        print 'Preparing to turn {} to RGB.'.format(n_images)
+        print('Preparing to turn {} to RGB.'.format(n_images))
         size = (self.img_size[0], self.img_size[1], 3)
         colored = np.zeros((n_images,) + size)
         for i in range(n_images):
             colored[i] =  color.gray2rgb(self.images_train[i])
-        print 'Turned {} images to {} shape.'.format(colored.shape[0], size)
+        print('Turned {} images to {} shape.'.format(colored.shape[0], size))
         for c in [0.01, 0.1, 1, 2, 10]:
-            print 'Fitting Pipeline (NN + SVC) C=', c
+            print('Fitting Pipeline (NN + SVC) C=', c)
             clf = Pipeline([
                             ('convnet', ConvNetFeatures(
                                         pretrained_params='/home/francesco/BigData/Kaggle/CatsDogs/imagenet.decafnet.epoch90',
@@ -390,7 +390,7 @@ class OcrData():
         clf.fit(self.data_train, self.labels_train)
         y_pred = clf.predict(self.data_train)
         
-        print 'Accuracy on train set: ', accuracy_score(self.labels_train, y_pred)
+        print('Accuracy on train set: ', accuracy_score(self.labels_train, y_pred))
 
         now = str(datetime.now()).replace(':','-')   
         fname_out = 'linearsvc-hog-fulltrain-{}.pickle'.format(now)
@@ -399,7 +399,7 @@ class OcrData():
         with open(full_name, 'wb') as fout:
             cPickle.dump(clf, fout, -1)
      
-        print "Saved model to {}".format(full_name)        
+        print("Saved model to {}".format(full_name))
         
 ################################################################################################################################
 
@@ -408,23 +408,23 @@ class OcrData():
         Evaluates best model out of CV on test set
         """
         if not self.automatic_split:
-            print 'Before performing any ML you should split your data!'
-            print 'Change to True the automatic_split in the config file.'
+            print('Before performing any ML you should split your data!')
+            print('Change to True the automatic_split in the config file.')
             sys.exit(0)
             
         if self.split==0:
-            print 'The percentage_of_test_set in the config.py is set to 0.'
-            print 'Thus you do not have a test set to evaluate your model on.'
+            print('The percentage_of_test_set in the config.py is set to 0.')
+            print('Thus you do not have a test set to evaluate your model on.')
             sys.exit(0)
                                
         with open(model_filename, 'rb') as fin:
             model = cPickle.load(fin)
      
         y_pred = model.predict(self.data_test)
-        print 'Test set shape: ', self.data_test.shape
-        print 'Target shape: ', self.labels_test.shape
-        print 'Accuracy on train set: ', accuracy_score(self.labels_train, model.predict(self.data_train))
-        print 'Accuracy on test set: ', accuracy_score(self.labels_test, y_pred)
+        print('Test set shape: ', self.data_test.shape)
+        print('Target shape: ', self.labels_test.shape)
+        print('Accuracy on train set: ', accuracy_score(self.labels_train, model.predict(self.data_train)))
+        print('Accuracy on test set: ', accuracy_score(self.labels_test, y_pred))
 
         if self.plot_evaluation:      
             target_names = sorted(np.unique(self.labels_test))

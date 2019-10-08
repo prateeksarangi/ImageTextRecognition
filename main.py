@@ -10,7 +10,7 @@ if __name__ == '__main__':
     ##### I want to emphasize that the commented code is the one necessary to get the models trained.
     
     # creates instance of class and loads image    
-    user = UserData('lao.jpg')
+    user = UserData('postcard-copy.jpg')
     # plots preprocessed imae 
     user.plot_preprocessed_image()
     # detects objects in preprocessed image

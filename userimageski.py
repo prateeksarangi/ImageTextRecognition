@@ -1,8 +1,8 @@
 import numpy as np
 from skimage.io import imread
-from skimage.filter import threshold_otsu
+from skimage.filters import threshold_otsu
 from skimage.transform import resize
-import cPickle
+import pickle
 from matplotlib import pyplot as plt
 from skimage.morphology import closing, square
 from skimage.measure import regionprops
@@ -10,6 +10,7 @@ from skimage import restoration
 from skimage import measure
 from skimage.color import label2rgb
 import matplotlib.patches as mpatches
+
 
 class UserData():
     """
@@ -81,11 +82,11 @@ class UserData():
                     'coordinates': np.array(coordinates)
                     }
         
-        print 'Images After Contour Detection'
-        print 'Fullscale: ', self.candidates['fullscale'].shape
-        print 'Flattened: ', self.candidates['flattened'].shape
-        print 'Contour Coordinates: ', self.candidates['coordinates'].shape
-        print '============================================================'
+        print('Images After Contour Detection')
+        print('Fullscale: ', self.candidates['fullscale'].shape)
+        print('Flattened: ', self.candidates['flattened'].shape)
+        print('Contour Coordinates: ', self.candidates['coordinates'].shape)
+        print('============================================================')
         
         return self.candidates 
     
@@ -96,8 +97,8 @@ class UserData():
         it takes as argument a pickle model and predicts whether the detected objects
         contain text or not. 
         """
-        with open(model_filename2, 'rb') as fin:
-            model = cPickle.load(fin)
+        with open(model_filena(e2, 'rb')) as fin:
+            model = pickle.load(fin)
             
         is_text = model.predict(self.candidates['flattened'])
         
@@ -107,12 +108,12 @@ class UserData():
                                  'coordinates': self.candidates['coordinates'][is_text == '1']
                                  }
 
-        print 'Images After Text Detection'
-        print 'Fullscale: ', self.to_be_classified['fullscale'].shape
-        print 'Flattened: ', self.to_be_classified['flattened'].shape
-        print 'Contour Coordinates: ', self.to_be_classified['coordinates'].shape
-        print 'Rectangles Identified as NOT containing Text '+str(self.candidates['coordinates'].shape[0]-self.to_be_classified['coordinates'].shape[0])+' out of '+str(self.candidates['coordinates'].shape[0])
-        print '============================================================'
+        print('Images After Text Detection')
+        print('Fullscale: ', self.to_be_classified['fullscale'].shape)
+        print('Flattened: ', self.to_be_classified['flattened'].shape)
+        print('Contour Coordinates: ', self.to_be_classified['coordinates'].shape)
+        print('Rectangles Identified as NOT containing Text '+str(self.candidates['coordinates'].shape[0]-self.to_be_classified['coordinates'].shape[0])+' out of '+str(self.candidates['coordinates'].shape[0]))
+        print('============================================================')
         
                
         return self.to_be_classified
@@ -124,7 +125,7 @@ class UserData():
         it takes as argument a pickle model and predicts character
         """
         with open(model_filename36, 'rb') as fin:
-            model = cPickle.load(fin)
+            model = pickle.load(fin)
             
         which_text = model.predict(self.to_be_classified['flattened'])
         
